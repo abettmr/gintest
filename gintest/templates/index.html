@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网盘主页</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        header {
+            background: #007bff;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        nav {
+            margin: 20px 0;
+        }
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #333;
+        }
+        section {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: smaller;
+            color: #777;
+        }
+    </style>
+    <script>
+        function validateRegistrationForm() {
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirm-password").value;
+
+            if (password !== confirmPassword) {
+                alert("两次输入的密码不一致，请重新输入！");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+<body>
+
+<header>
+    <h1>欢迎来到我们的云存储服务平台！</h1>
+</header>
+
+<nav>
+    <a href="register">注册</a>
+    <a href="#login">登录</a>
+    <a href="#my-files">我的文件</a>
+    <a href="#support">客户支持</a>
+</nav>
+
+<section id="features">
+    <h2>功能特色</h2>
+    <ul>
+        <li><strong>安全存储</strong>：我们提供军工级别的加密技术，确保您的数据安全无忧。</li>
+        <li><strong>随时访问</strong>：无论你身在何处，通过任何设备均可访问您的文件。</li>
+        <li><strong>分享和协作</strong>：轻松分享文件给朋友或同事，支持多人在线协作编辑。</li>
+    </ul>
+</section>
+
+<section id="register">
+    <h2>注册说明</h2>
+    <form action="#" method="post" onsubmit="return validateRegistrationForm();">
+        <label for="email">邮箱：</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="password">密码：</label>
+        <input type="password" id="password" name="password" required>
+        
+        <label for="confirm-password">确认密码：</label>
+        <input type="password" id="confirm-password" name="confirm-password" required>
+        
+        <button type="submit">注册</button>
+    </form>
+</section>
+
+<section id="login">
+    <h2>登录</h2>
+    <form action="#" method="post">
+        <label for="username">用户名：</label>
+        <input type="text" id="username" name="username" required>
+        
+        <label for="password">密码：</label>
+        <input type="password" id="password-login" name="password" required>
+        
+        <button type="submit">登录</button>
+    </form>
+</section>
+
+<section id="my-files">
+    <h2>我的文件</h2>
+    <ul>
+        <li><strong>上传文件</strong>：快速上传您的文档、照片和视频。</li>
+        <li><strong>新建文件夹</strong>：为您的文件分类，管理更加高效。</li>
+        <li><strong>下载与分享</strong>：一键下载文件，生成分享链接与他人共享。</li>
+    </ul>
+</section>
+
+<section id="support">
+    <h2>客户支持</h2>
+    <p>如有任何问题，请联系我们的客服团队：</p>
+    <ul>
+        <li>邮箱：<a href="mailto:support@example.com">support@example.com</a></li>
+        <li>热线：400-123-4567</li>
+    </ul>
+</section>
+
+<footer>
+    <p>&copy; 2023 网盘服务平台. 保留所有权利.</p>
+</footer>
+
+</body>
+</html>
