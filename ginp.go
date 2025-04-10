@@ -1,7 +1,7 @@
 package main
 
 import (
-	. "ginprac/service"
+	. "ginprac/controller"
 
 	"github.com/gin-gonic/gin"
 )
