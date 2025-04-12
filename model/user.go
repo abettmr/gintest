@@ -15,7 +15,7 @@ func (ua UserAccount) GetPwd() string {
 	return ua.Pwd
 }
 
-type User struct {
+type UserForm struct {
 	Name string `json:"name,omitempty" form:"name"`
 	Id   int64  `json:"id,omitempty" form:"name"`
 	Age  int8   `json:"age,omitempty" form:"name"`
