@@ -1,0 +1,57 @@
+syntax = "v1"
+
+info (
+	title:   "网盘系统-用户模块"
+	desc:    "用户相关接口"
+	version: "v1"
+)
+
+import "../base.api"
+
+type (
+	UserBasicInfo {
+		Identity string `json:"identity"`
+		Name     string `json:"name"`
+		Email    string `json:"email"`
+	}
+	LoginReq {
+		Name     string `json:"name"`
+		Password string `json:"password"`
+	}
+	LoginResp {
+		Token string `json:"token"`
+		UserBasicInfo
+	}
+	UserDetailResp {
+		UserBasicInfo
+		CreatedAt string `json:"created_at"`
+	}
+	RegisterReq {
+		Name     string `json:"name"`
+		Password string `json:"password"`
+		Email    string `json:"email"`
+	}
+	ChangePasswordReq {
+		OldPassword string `json:"old_password"`
+		NewPassword string `json:"new_password"`
+	}
+)
+
+@server (
+	prefix: /user/v1
+	group:  user
+)
+service user {
+	@handler register
+	post /register (RegisterReq) returns (DataResponse /*[LoginResp]*/)
+
+	@handler login
+	post /login (LoginReq) returns (DataResponse /*[LoginResp]*/)
+
+	@handler detail
+	get /detail returns (DataResponse /*[UserDetailResp]*/)
+
+	@handler changePassword
+	post /password/change (ChangePasswordReq) returns (BaseResponse)
+}
+

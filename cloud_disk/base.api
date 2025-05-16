@@ -1,0 +1,47 @@
+syntax = "v1"
+
+// type T = interface{}
+
+type (
+    // 基础响应结构
+    BaseResponse {
+        Code    int    `json:"code"`
+        Message string `json:"message"`
+    }
+
+    T {
+        Data interface{}
+    }
+    // 带数据的响应结构
+    DataResponse {
+        BaseResponse
+        Data T `json:"data"`
+    }
+    
+    // 分页响应结构
+    PageResponse {
+        BaseResponse
+        Data  []T   `json:"data"`
+        Total int64 `json:"total"`
+    }
+
+    IdJsonReq {
+		Identity string `json:"identity"`
+	}
+
+	IdFormReq {
+		Identity string `form"identity"`
+	}
+    // // 带数据的响应结构
+    // DataResponse[T] {
+    //     BaseResponse
+    //     Data T `json:"data"`
+    // }
+    
+    // // 分页响应结构
+    // PageResponse[T] {
+    //     BaseResponse
+    //     Data  []T   `json:"data"`
+    //     Total int64 `json:"total"`
+    // }
+)

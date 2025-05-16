@@ -1,0 +1,65 @@
+syntax = "v1"
+
+info(
+	title: "网盘系统-用户模块"
+	desc: "用户相关接口"
+	version: "v1"
+)
+
+type (
+    // 用户基本信息
+    UserBasicInfo {
+        Identity string `json:"identity"`
+        Name     string `json:"name"`
+        Email    string `json:"email"`
+    }
+    
+    // 用户登录请求
+    LoginReq {
+        Name     string `json:"name"`
+        Password string `json:"password"`
+    }
+    
+    // 用户登录响应
+    LoginResp {
+        Token string `json:"token"`
+        UserBasicInfo
+    }
+    
+    // 用户详情响应
+    UserDetailResp {
+        UserBasicInfo
+        CreatedAt string `json:"created_at"`
+    }
+    
+    // 用户注册请求
+    RegisterReq {
+        Name     string `json:"name"`
+        Password string `json:"password"`
+        Email    string `json:"email"`
+    }
+    
+    // 修改密码请求
+    ChangePasswordReq {
+        OldPassword string `json:"old_password"`
+        NewPassword string `json:"new_password"`
+    }
+)
+
+@server(
+    prefix: /user/v1
+    group: user
+)
+service user {
+    @handler register
+    post /register (RegisterReq) returns (LoginResp)
+    
+    @handler login
+    post /login (LoginReq) returns (LoginResp)
+    
+    @handler detail
+    get /detail returns (UserDetailResp)
+    
+    @handler changePassword
+    post /password/change (ChangePasswordReq) returns (Response)
+}
