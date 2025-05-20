@@ -1,0 +1,295 @@
+type (
+	// 基础响应结构
+	BaseResponse {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+	}
+	T {
+		Data interface{}
+	}
+	// 带数据的响应结构
+	DataResponse {
+		BaseResponse
+		Data T `json:"data"`
+	}
+	// 分页响应结构
+	PageResponse {
+		BaseResponse
+		Data  []T   `json:"data"`
+		Total int64 `json:"total"`
+	}
+	IdJsonReq {
+		Identity string `json:"identity"`
+	}
+	IdFormReq {
+		Identity string `form:"identity"`
+	}
+)
+
+type (
+	UserBasicInfo {
+		Identity string `json:"identity"`
+		Name     string `json:"name"`
+		Email    string `json:"email"`
+	}
+	LoginReq {
+		Name     string `json:"name"`
+		Password string `json:"password"`
+	}
+	LoginResp {
+		Token string `json:"token"`
+		UserBasicInfo
+	}
+	UserDetailResp {
+		UserBasicInfo
+		CreatedAt string `json:"created_at"`
+	}
+	RegisterReq {
+		Name     string `json:"name"`
+		Password string `json:"password"`
+		Email    string `json:"email"`
+	}
+	ChangePasswordReq {
+		OldPassword string `json:"old_password"`
+		NewPassword string `json:"new_password"`
+	}
+	FileItem {
+		Identity  string `json:"identity"`
+		Name      string `json:"name"`
+		Ext       string `json:"ext"`
+		Size      int64  `json:"size"`
+		Path      string `json:"path"`
+		CreatedAt string `json:"created_at"`
+	}
+	FileListReq {
+		ParentId *int64 `form:"parent_id,omitempty"`
+		Page     *int   `form:"page,omitempty"`
+		Size     *int   `form:"size,omitempty"`
+	}
+	FileUploadReq {
+		File     string `form:"file"`
+		ParentId *int64 `form:"parent_id,omitempty"`
+	}
+	FolderCreateReq {
+		Name     string `json:"name"`
+		ParentId *int64 `form:"parent_id,omitempty"`
+	}
+	FileRenameReq {
+		Identity string `json:"identity"`
+		NewName  string `json:"new_name"`
+	}
+	FileMoveReq {
+		Identity string `json:"identity"`
+		ParentId int64  `json:"parent_id"` // 正常情况下不应该是可选
+	}
+	// 用户仓库项
+	UserRepoItem {
+		Identity     string `json:"identity"`
+		UserIdentity string `json:"user_identity"`
+		RepoIdentity string `json:"repo_identity"`
+		ParentId     int64  `json:"parent_id"`
+		Ext          string `json:"ext"`
+		CreatedAt    string `json:"created_at"`
+		UpdatedAt    string `json:"updated_at"`
+	}
+	// 用户仓库详情
+	UserRepoDetail {
+		UserRepoItem
+		Name string `json:"name"`
+		Size int64  `json:"size"`
+		Path string `json:"path"`
+	}
+	// 列表请求
+	UserRepoListReq {
+		ParentId *int64 `form:"parent_id,omitempty"`
+		Page     *int   `form:"page,omitempty"`
+		Size     *int   `form:"size,omitempty"`
+	}
+	// 创建请求
+	UserRepoCreateReq {
+		RepoIdentity string  `json:"repo_identity"`
+		ParentId     *int64  `form:"parent_id,omitempty"`
+		Ext          *string `json:"ext,omitempty"`
+	}
+	// 移动请求
+	UserRepoMoveReq {
+		Identity string `json:"identity"`
+		ParentId int64  `json:"parent_id"` // 正常情况下不应该是可选
+	}
+	// 分享基本信息
+	ShareBasicInfo {
+		Identity     string `json:"identity"`
+		UserIdentity string `json:"user_identity"`
+		RepoIdentity string `json:"repo_identity"`
+		ExpireTime   int64  `json:"expire_time"` // Unix时间戳
+		CreatedAt    string `json:"created_at"`
+		UpdatedAt    string `json:"updated_at"`
+	}
+	// 分享详情信息
+	ShareDetailInfo {
+		ShareBasicInfo
+		FileName    string `json:"file_name"`
+		FileSize    int64  `json:"file_size"`
+		FileExt     string `json:"file_ext"`
+		DownloadNum int64  `json:"download_num"` // 下载次数
+	}
+	// 创建分享请求
+	ShareCreateReq {
+		RepoIdentity string  `json:"repo_identity"`
+		ExpireTime   *int64  `json:"expire_time,omitempty"` // 秒数，0表示永久
+		Password     *string `json:"password,omitempty"` // 可选密码
+	}
+	// 分享验证请求
+	ShareVerifyReq {
+		Identity string  `json:"identity"`
+		Password *string `json:"password,omitempty"` // 如果有密码保护
+	}
+	// 分享验证响应
+	ShareVerifyResp {
+		Valid        bool   `json:"valid"`
+		FileName     string `json:"file_name"`
+		FileSize     int64  `json:"file_size"`
+		FileExt      string `json:"file_ext"`
+		ExpireTime   int64  `json:"expire_time"`
+		NeedPassword bool   `json:"need_password"`
+	}
+	// 分享列表项
+	ShareListItem {
+		ShareBasicInfo
+		FileName  string `json:"file_name"`
+		FileExt   string `json:"file_ext"`
+		IsExpired bool   `json:"is_expired"`
+	}
+	// 分享统计信息
+	ShareStats {
+		TotalShares    int64 `json:"total_shares"`
+		ActiveShares   int64 `json:"active_shares"`
+		TotalDownloads int64 `json:"total_downloads"`
+	}
+	PopShareReq {
+		Limit *int `form:"limit,default=10"`
+	}
+)
+
+@server (
+	prefix:     /share/v1
+	group:      share
+	middleware: Auth // 需要认证的中间件
+// jwt:        Auth // 使用JWT进行认证
+)
+service core {
+	// 创建分享
+	@handler createShare
+	post /create (ShareCreateReq) returns (DataResponse /*[ShareBasicInfo]*/)
+
+	// 获取分享详情
+	@handler getShareDetail
+	get /detail (IdJsonReq) returns (DataResponse /*[ShareBasicInfo]*/)
+
+	// 验证分享
+	@handler verifyShare
+	post /verify (ShareVerifyReq) returns (DataResponse /*[ShareVerifyResp]*/)
+
+	// 下载分享文件
+	@handler downloadShare
+	get /download (IdJsonReq) returns (BaseResponse)
+
+	// 获取我的分享列表
+	@handler listMyShares
+	get /my/list returns (PageResponse /*[ShareListItem]*/)
+
+	// 获取分享统计
+	@handler getShareStats
+	get /stats returns (DataResponse /*[ShareStats]*/)
+
+	// 更新分享设置
+	@handler updateShare
+	post /update (ShareBasicInfo) returns (BaseResponse)
+
+	// 取消分享
+	@handler cancelShare
+	post /cancel (IdFormReq) returns (BaseResponse)
+
+	// 获取热门分享
+	@handler getPopularShares
+	get /popular (PopShareReq) returns (DataResponse /*[[]ShareListItem]*/)
+}
+
+@server (
+	prefix:     /user-repo/v1
+	group:      userRepo
+	middleware: Auth // 需要认证的中间件
+// jwt:        Auth // 使用JWT进行认证
+)
+service core {
+	@handler list
+	get /list (UserRepoListReq) returns (PageResponse /*[UserRepoDetail]*/)
+
+	@handler create
+	post /create (UserRepoCreateReq) returns (DataResponse /*[UserRepoItem]*/)
+
+	@handler detail
+	get /detail (IdFormReq) returns (DataResponse /*[UserRepoDetail]*/)
+
+	@handler move
+	post /move (UserRepoMoveReq) returns (BaseResponse)
+
+	@handler delete
+	post /delete (IdJsonReq) returns (BaseResponse)
+}
+
+@server (
+	prefix:     /repo/v1
+	group:      repository
+	middleware: Auth // 需要认证的中间件
+// jwt:        Auth // 使用JWT进行认证
+)
+service core {
+	@handler list
+	get /list (FileListReq) returns (PageResponse /*[FileItem]*/)
+
+	@handler upload
+	post /upload (FileUploadReq) returns (BaseResponse)
+
+	@handler download
+	get /download (IdFormReq) returns (BaseResponse)
+
+	@handler createFolder
+	post /folder/create (FolderCreateReq) returns (BaseResponse)
+
+	@handler rename
+	post /rename (FileRenameReq) returns (BaseResponse)
+
+	@handler move
+	post /move (FileMoveReq) returns (BaseResponse)
+
+	@handler delete
+	post /delete (IdJsonReq) returns (BaseResponse)
+}
+
+@server (
+	prefix: /user/v1
+	group:  user
+)
+service core {
+	@handler register
+	post /register (RegisterReq) returns (DataResponse /*[LoginResp]*/)
+
+	@handler login
+	post /login (LoginReq) returns (DataResponse /*[LoginResp]*/)
+}
+
+@server (
+	prefix:     /user/v1
+	group:      user
+	middleware: Auth // 需要认证的中间件
+// jwt:        Auth // 使用JWT进行认证
+)
+service core {
+	@handler detail
+	get /detail returns (DataResponse /*[UserDetailResp]*/)
+
+	@handler changePassword
+	post /password/change (ChangePasswordReq) returns (BaseResponse)
+}
+

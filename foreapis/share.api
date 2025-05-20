@@ -1,0 +1,64 @@
+syntax = "v1"
+
+info(
+	title: "网盘系统-文件分享模块"
+	desc: "文件分享相关接口"
+	version: "v1"
+)
+
+type (
+    // 分享创建请求
+    ShareCreateReq {
+        RepoIdentity string `json:"repo_identity"`
+        ExpireTime   int    `json:"expire_time,optional"` // 单位：小时
+    }
+    
+    // 分享详情响应
+    ShareDetailResp {
+        Identity      string `json:"identity"`
+        UserIdentity  string `json:"user_identity"`
+        RepoIdentity  string `json:"repo_identity"`
+        ExpireTime    int64  `json:"expire_time"`
+        CreatedAt     string `json:"created_at"`
+    }
+    
+    // 分享列表响应
+    ShareListResp {
+        List  []ShareDetailResp `json:"list"`
+        Total int64             `json:"total"`
+    }
+    
+    // 分享验证请求
+    ShareVerifyReq {
+        Identity string `form:"identity"`
+    }
+    
+    // 分享验证响应
+    ShareVerifyResp {
+        Valid      bool   `json:"valid"`
+        FileName   string `json:"file_name,optional"`
+        FileSize   int64  `json:"file_size,optional"`
+        ExpireTime int64  `json:"expire_time,optional"`
+    }
+)
+
+@server(
+    prefix: /share/v1
+    group: share
+)
+service share {
+    @handler create
+    post /create (ShareCreateReq) returns (Response)
+    
+    @handler list
+    get /list returns (ShareListResp)
+    
+    @handler delete
+    post /delete (Identity string `json:"identity") returns (Response)
+    
+    @handler verify
+    get /verify (ShareVerifyReq) returns (ShareVerifyResp)
+    
+    @handler download
+    get /download (Identity string `form:"identity") returns (stream)
+}

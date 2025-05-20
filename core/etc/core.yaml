@@ -1,0 +1,20 @@
+Name: core
+Host: 0.0.0.0
+Port: 8888
+
+Mysql:
+  DataSource: "root:a@tcp(localhost:3306)/cloud_disk?charset=utf8&parseTime=True&loc=Local"
+Redis:
+  Address: "localhost"
+  Port: 6379
+OSS:
+  Endpoint: "https://s3.bitiful.net"
+  AccessKey: ""
+  SecretKey: ""
+  Bucket: "cdis"
+  Region: "cn-east-1"
+  # Domain: "https://cloud-disk.oss-cn-hangzhou.aliyuncs.com"
+
+Auth:
+  AccessSecret: "123"
+  AccessExpire: 3600

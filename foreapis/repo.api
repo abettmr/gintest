@@ -1,0 +1,83 @@
+syntax = "v1"
+
+info(
+	title: "网盘系统-文件存储模块"
+	desc: "文件上传下载管理"
+	version: "v1"
+)
+
+type (
+    // 文件基本信息
+    FileItem {
+        Identity  string `json:"identity"`
+        Name      string `json:"name"`
+        Ext       string `json:"ext"`
+        Size      int64  `json:"size"`
+        Path      string `json:"path"`
+        CreatedAt string `json:"created_at"`
+    }
+    
+    // 文件列表请求
+    FileListReq {
+        ParentId int64 `form:"parent_id,optional"`
+        Page     int   `form:"page,optional"`
+        Size     int   `form:"size,optional"`
+    }
+    
+    // 文件列表响应
+    FileListResp {
+        List  []FileItem `json:"list"`
+        Total int64      `json:"total"`
+    }
+    
+    // 文件上传请求
+    FileUploadReq {
+        File     string `form:"file"`
+        ParentId int64  `form:"parent_id,optional"`
+    }
+    
+    // 文件夹创建请求
+    FolderCreateReq {
+        Name     string `json:"name"`
+        ParentId int64  `json:"parent_id,optional"`
+    }
+    
+    // 文件重命名请求
+    FileRenameReq {
+        Identity string `json:"identity"`
+        NewName  string `json:"new_name"`
+    }
+    
+    // 文件移动请求
+    FileMoveReq {
+        Identity string `json:"identity"`
+        ParentId int64  `json:"parent_id"`
+    }
+)
+
+@server(
+    prefix: /repo/v1
+    group: repository
+)
+service repository {
+    @handler list
+    get /list (FileListReq) returns (FileListResp)
+    
+    @handler upload
+    post /upload (FileUploadReq) returns (Response)
+    
+    @handler download
+    get /download (Identity string `form:"identity") returns (stream)
+    
+    @handler createFolder
+    post /folder/create (FolderCreateReq) returns (Response)
+    
+    @handler rename
+    post /rename (FileRenameReq) returns (Response)
+    
+    @handler move
+    post /move (FileMoveReq) returns (Response)
+    
+    @handler delete
+    post /delete (Identity string `json:"identity") returns (Response)
+}

@@ -1,0 +1,68 @@
+syntax = "v1"
+
+info (
+	title:   "网盘系统-用户仓库模块"
+	desc:    "用户与仓库关联关系管理"
+	version: "v1"
+)
+
+import "../base.api"
+
+type (
+	// 用户仓库项
+	UserRepoItem {
+		Identity     string `json:"identity"`
+		UserIdentity string `json:"user_identity"`
+		RepoIdentity string `json:"repo_identity"`
+		ParentId     int64  `json:"parent_id"`
+		Ext          string `json:"ext"`
+		CreatedAt    string `json:"created_at"`
+		UpdatedAt    string `json:"updated_at"`
+	}
+	// 用户仓库详情
+	UserRepoDetail {
+		UserRepoItem
+		Name string `json:"name"`
+		Size int64  `json:"size"`
+		Path string `json:"path"`
+	}
+	// 列表请求
+	UserRepoListReq {
+		ParentId int64 `form:"parent_id,optional"`
+		Page     int   `form:"page,optional"`
+		Size     int   `form:"size,optional"`
+	}
+	// 创建请求
+	UserRepoCreateReq {
+		RepoIdentity string `json:"repo_identity"`
+		ParentId     int64  `json:"parent_id,optional"`
+		Ext          string `json:"ext,optional"`
+	}
+	// 移动请求
+	UserRepoMoveReq {
+		Identity string `json:"identity"`
+		ParentId int64  `json:"parent_id"`
+	}
+)
+
+@server (
+	prefix: /user-repo/v1
+	group:  userRepo
+)
+service userRepo {
+	@handler list
+	get /list (UserRepoListReq) returns (PageResponse /*[UserRepoDetail]*/)
+
+	@handler create
+	post /create (UserRepoCreateReq) returns (DataResponse /*[UserRepoItem]*/)
+
+	@handler detail
+	get /detail (IdFormReq) returns (DataResponse /*[UserRepoDetail]*/)
+
+	@handler move
+	post /move (UserRepoMoveReq) returns (BaseResponse)
+
+	@handler delete
+	post /delete (IdJsonReq) returns (BaseResponse)
+}
+
